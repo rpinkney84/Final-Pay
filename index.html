@@ -21,55 +21,55 @@
                 <input type="text" id="name" placeholder="John Doe" required>
             </div>
             <div>
-                <label for="card-number">Card Number:</label>
-                <div id="card-number-container"></div>
+                <label for="card-number-container">Card Number:</label>
+                <div id="card-number-container"></div> <!-- Match the ID here -->
             </div>
             <div>
-                <label for="cvv">CVV:</label>
-                <div id="cvv-container"></div>
+                <label for="cvv-container">CVV:</label>
+                <div id="cvv-container"></div> <!-- Match the ID here -->
             </div>
             <div>
-                <label for="expiration-date">Expiration Date:</label>
-                <div id="expiration-date-container"></div>
+                <label for="expiration-date-container">Expiration Date:</label>
+                <div id="expiration-date-container"></div> <!-- Match the ID here -->
             </div>
             <button type="submit">Pay</button>
         </form>
     </main>
 
     <script>
-        const paymentForm = new SqPaymentForm({
-            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',  // Replace with your production application ID
-            locationId: 'LEYMZHA02ZJ74',          // Replace with your production location ID
-            inputClass: 'sq-input',
-            autoBuild: false, // Ensure this is false for manual setup
-            // Define the input fields
-            cardNumber: {
-                elementId: 'card-number-container',
-                placeholder: 'Card Number',
-                required: true,
-            },
-            cvv: {
-                elementId: 'cvv-container',
-                placeholder: 'CVV',
-                required: true,
-            },
-            expirationDate: {
-                elementId: 'expiration-date-container',
-                placeholder: 'MM/YY',
-                required: true,
-            },
-            // Handle errors
-            callbacks: {
-                onError: function (error) {
-                    console.error(error);
-                    alert(error.message);
+        document.addEventListener('DOMContentLoaded', function () {
+            const paymentForm = new SqPaymentForm({
+                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',  // Replace with your production application ID
+                locationId: 'LEYMZHA02ZJ74',          // Replace with your production location ID
+                inputClass: 'sq-input',
+                autoBuild: false,
+                cardNumber: {
+                    elementId: 'card-number-container',
+                    placeholder: 'Card Number',
+                    required: true,
+                },
+                cvv: {
+                    elementId: 'cvv-container',
+                    placeholder: 'CVV',
+                    required: true,
+                },
+                expirationDate: {
+                    elementId: 'expiration-date-container',
+                    placeholder: 'MM/YY',
+                    required: true,
+                },
+                callbacks: {
+                    onError: function (error) {
+                        console.error(error);
+                        alert(error.message);
+                    }
                 }
-            }
-        });
+            });
 
-        document.getElementById('payment-form').addEventListener('submit', (event) => {
-            event.preventDefault();
-            paymentForm.requestCardNonce(); // Create a nonce to process payment
+            document.getElementById('payment-form').addEventListener('submit', (event) => {
+                event.preventDefault();
+                paymentForm.requestCardNonce(); // Create a nonce to process payment
+            });
         });
     </script>
 </body>
