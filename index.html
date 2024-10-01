@@ -23,7 +23,7 @@
         .logo-container img {
             max-width: 100%;
             height: auto;
-            width: 200px; /* Adjust initial size */
+            width: 200px;
         }
         .sq-input {
             margin-bottom: 15px;
@@ -36,15 +36,14 @@
             color: red;
             font-size: 12px;
         }
-        /* Media Queries for Responsive Design */
         @media (max-width: 600px) {
             .logo-container img {
-                width: 150px; /* Smaller size for mobile */
+                width: 150px;
             }
         }
         @media (min-width: 1200px) {
             .logo-container img {
-                width: 300px; /* Larger size for desktops */
+                width: 300px;
             }
         }
     </style>
@@ -52,7 +51,7 @@
 <body>
     <!-- Logo Section -->
     <div class="logo-container">
-        <img src="/mnt/data/FF_LOGOs_registered-2R-down-gb.png" alt="Final Frontier Logo">
+        <img src="/public/FF_LOGOs_registered-2R-down-gb.png" alt="Final Frontier Logo">
     </div>
 
     <h1>Payment Form</h1>
@@ -61,7 +60,7 @@
             <label for="name">Name on Card:</label>
             <input type="text" id="name" class="sq-input" placeholder="Enter your name" required>
         </div>
-        <div id="card-container"></div> <!-- Square handles the card input here -->
+        <div id="card-container"></div>
         <button type="submit">Pay</button>
         <div class="error" id="error-message"></div>
     </form>
@@ -69,8 +68,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const paymentForm = new SqPaymentForm({
-                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Your application ID
-                locationId: 'LEYMZHA02ZJ74', // Your location ID
+                applicationId: '<%= process.env.SQUARE_APP_ID %>', // Securely fetch Application ID from environment
+                locationId: '<%= process.env.SQUARE_LOCATION_ID %>', // Fetch Location ID from environment
                 inputClass: 'sq-input',
                 inputStyles: [{
                     fontSize: '16px',
@@ -79,37 +78,31 @@
                     placeholderColor: '#A0A0A0'
                 }],
                 card: {
-                    elementId: 'card-container', // ID where Square renders card fields
+                    elementId: 'card-container',
                     placeholder: 'Card Number'
                 }
             });
 
-            paymentForm.build(); // Build the payment form
+            paymentForm.build();
 
-            // Handle form submission
             document.getElementById('payment-form').addEventListener('submit', function(event) {
                 event.preventDefault();
                 const name = document.getElementById('name').value;
 
-                // Validate fields
                 if (!name) {
                     document.getElementById('error-message').textContent = "Please fill out all fields.";
                     return;
                 }
 
-                // Request card nonce
-                paymentForm.requestCardNonce(); // Triggers the Square library to handle card input
+                paymentForm.requestCardNonce();
             });
 
             paymentForm.on('cardNonceResponseReceived', function(errors, nonce) {
                 if (errors) {
-                    console.error('Errors:', errors);
                     document.getElementById('error-message').textContent = "Error in card details.";
                     return;
                 }
 
-                console.log('Nonce received:', nonce);
-                // Send the nonce and amount to the server
                 fetch('/process-payment', {
                     method: 'POST',
                     headers: {
@@ -117,11 +110,12 @@
                     },
                     body: JSON.stringify({ 
                         nonce: nonce, 
-                        amount: 1000 // Set this to the actual amount in cents
+                        amount: 1000 // Replace with actual amount (cents)
                     })
-                }).then(response => response.json())
-                  .then(data => console.log('Payment response:', data))
-                  .catch(err => console.error('Payment error:', err));
+                })
+                .then(response => response.json())
+                .then(data => console.log('Payment response:', data))
+                .catch(err => console.error('Payment error:', err));
             });
         });
     </script>
