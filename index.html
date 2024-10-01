@@ -5,60 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Form</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://js.squareup.com/v2/paymentform"></script> <!-- Production URL for Square SDK -->
+    <script src="https://js.squareup.com/v2/paymentform"></script>
     <style>
-        /* Responsive styles for the logo */
-        img {
-            max-width: 100%;
-            height: auto; /* Maintain aspect ratio */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
         }
-        /* Additional styles to ensure a good layout */
-        #card-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Space between fields */
-            margin-top: 20px; /* Space above the payment fields */
+        #logo {
+            max-height: 1in; /* Set the maximum height */
+            max-width: 2in;  /* Set the maximum width */
+            display: block;
+            margin: 0 auto 20px; /* Center the logo and add space below */
         }
-        .error-message {
-            color: red;
-            margin-top: 10px;
+        #payment-form {
+            width: 300px; /* Width of the form */
+            margin: 0 auto; /* Center the form */
+        }
+        input {
+            width: 100%;
+            margin-bottom: 10px; /* Space between input fields */
+            padding: 10px; /* Padding for input fields */
+        }
+        button {
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            padding: 10px; /* Button padding */
+            border: none; /* No border */
+            cursor: pointer; /* Pointer cursor */
+            width: 100%; /* Full-width button */
+        }
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
         }
     </style>
 </head>
 <body>
+    <img id="logo" src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Final Frontier Logo">
 
-    <div class="container">
-        <header>
-            <h1>Final Payment</h1>
-            <a target="_blank" href="https://www.imghost.net/YfxupcFdWUez0Va">
-                <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Name Doublestack in Black with Trademark.png"/>
-            </a>
-        </header>
-
-        <form id="payment-form">
-            <div>
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div id="card-container">
-                <div id="card-number-container"></div>
-                <div id="cvv-container"></div>
-                <div id="expiration-date-container"></div>
-            </div>
-            <button type="submit">Pay</button>
-        </form>
-
-        <div id="error-message" class="error-message"></div>
+    <h1>Payment Form</h1>
+    <div id="payment-form">
+        <div id="card-number-container"></div>
+        <div id="cvv-container"></div>
+        <div id="expiration-date-container"></div>
+        <button id="card-button">Pay</button>
     </div>
 
     <script>
         const paymentForm = new SqPaymentForm({
-            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Your Production Application ID
-            locationId: 'LEYMZHA02ZJ74', // Your Production Location ID
-            inputClass: 'sq-input',
-            autoBuild: false, // Set to false to build the form manually
-
-            // Callbacks for rendering inputs
+            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',
+            locationId: 'LEYMZHA02ZJ74',
             cardNumber: {
                 elementId: 'card-number-container',
                 placeholder: 'Card Number'
@@ -71,46 +68,25 @@
                 elementId: 'expiration-date-container',
                 placeholder: 'MM/YY'
             },
-
-            // Callbacks for handling payment submission
             callbacks: {
-                onPaymentFormLoaded: function() {
-                    console.log("Payment form loaded successfully");
-                },
-                onPaymentFormSubmit: function() {
-                    console.log("Payment form submitted");
-                },
-                onCardNonceResponseReceived: function(errors, nonce) {
+                // Handle the response from Square after payment processing
+                cardNonceResponseReceived: function(errors, nonce, cardData) {
                     if (errors) {
-                        // Handle errors
-                        console.log(errors);
+                        console.error(errors);
+                        alert('Payment failed, please try again.');
                         return;
                     }
-
-                    // Send the nonce to your server
-                    const payload = { nonce: nonce, amount: 20130 }; // Amount in cents
-                    fetch('/process-payment', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(payload),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Payment processed successfully:', data);
-                    })
-                    .catch((error) => {
-                        console.error('Error processing payment:', error);
-                    });
-                },
-                onError: function(error) {
-                    console.error('Payment form error:', error);
+                    // Handle successful payment
+                    console.log('Nonce received:', nonce);
+                    // Send nonce to your server for processing
                 }
             }
         });
 
-        paymentForm.build(); // Build the payment form
+        document.getElementById('card-button').addEventListener('click', function(e) {
+            e.preventDefault();
+            paymentForm.requestCardNonce();
+        });
     </script>
 </body>
 </html>
