@@ -54,8 +54,8 @@
 
     <script>
         const paymentForm = new SqPaymentForm({
-            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',
-            locationId: 'LEYMZHA02ZJ74',
+            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Replace with your actual app ID
+            locationId: 'LEYMZHA02ZJ74',       // Replace with your actual location ID
             cardNumber: {
                 elementId: 'card-number-container',
                 placeholder: 'Card Number'
@@ -69,7 +69,6 @@
                 placeholder: 'MM/YY'
             },
             callbacks: {
-                // Handle the response from Square after payment processing
                 cardNonceResponseReceived: function(errors, nonce, cardData) {
                     if (errors) {
                         console.error(errors);
