@@ -1,55 +1,48 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { Client, Environment } = require('square');  // Square SDK
 
 const app = express();
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname))); // Serve static files (like index.html)
 
 // Square API credentials
-const accessToken = process.env.ACCESS_TOKEN || 'YOUR_DEFAULT_ACCESS_TOKEN'; 
-
-// Initialize Square SDK Client
-const client = new Client({
-  accessToken: accessToken,
-  environment: Environment.Production,  // Use 'Sandbox' for testing
-});
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const LOCATION_ID = process.env.SQUARE_LOCATION_ID;
+const API_URL = 'https://connect.squareup.com/v2/payments';
 
 // Payment processing endpoint
 app.post('/process-payment', async (req, res) => {
     const { nonce, amount } = req.body;
 
-    if (!nonce || !amount || isNaN(amount)) {
-        return res.status(400).json({ error: "Invalid nonce or amount." });
+    if (!amount || isNaN(amount)) {
+        return res.status(400).json({ error: "Invalid amount." });
     }
 
-    // Read card details from JSON file
-    let cardDetails;
-    try {
-        const data = fs.readFileSync(path.join(__dirname, 'cards.json'), 'utf8');
-        cardDetails = JSON.parse(data);
-    } catch (error) {
-        return res.status(500).json({ error: 'Error reading card details.' });
-    }
+    const payload = {
+        idempotency_key: new Date().getTime().toString(),
+        source_id: nonce,
+        amount_money: {
+            amount: amount,
+            currency: 'USD'
+        },
+        location_id: LOCATION_ID
+    };
 
-    // Create payment request payload
     try {
-        const response = await client.paymentsApi.createPayment({
-            sourceId: nonce,
-            idempotencyKey: `key_${new Date().getTime()}`,  // Unique for every payment
-            amountMoney: {
-                amount: amount,  // Amount in cents
-                currency: 'USD',
+        const response = await axios.post(API_URL, payload, {
+            headers: {
+                'Square-Version': '2023-09-13',
+                'Authorization': `Bearer ${ACCESS_TOKEN}`,
+                'Content-Type': 'application/json',
             },
-            locationId: process.env.LOCATION_ID || 'YOUR_DEFAULT_LOCATION_ID',
-            note: `Payment for ${cardDetails.name || 'Customer'}`,
         });
-        res.json(response.result);
+        res.json(response.data);
     } catch (error) {
-        console.error('Payment failed:', error);
-        res.status(500).json({ error: error.message });
+        console.error('Error:', error.response.data);
+        res.status(500).json({ error: error.response.data });
     }
 });
 

@@ -51,14 +51,14 @@
 <body>
     <!-- Logo Section -->
     <div class="logo-container">
-        <img src="https://github.com/rpinkney84/Final-Pay/blob/main/FF_LOGOs_registered-2R-down-gb.png" alt="Final Frontier Logo">
+        <img src="/public/FF_LOGOs_registered-2R-down-gb.png" alt="Final Frontier Logo">
     </div>
 
     <h1>Payment Form</h1>
     <form id="payment-form">
         <div>
             <label for="name">Name on Card:</label>
-            <input type="text" id="name" name="name" class="sq-input" placeholder="Enter your name" required>
+            <input type="text" id="name" class="sq-input" placeholder="Enter your name" required>
         </div>
         <div id="card-container"></div>
         <button type="submit">Pay</button>
@@ -68,8 +68,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const paymentForm = new SqPaymentForm({
-                applicationId: '<%= process.env.SQUARE_APP_ID %>',
-                locationId: '<%= process.env.SQUARE_LOCATION_ID %>',
+                applicationId: '<%= process.env.SQUARE_APP_ID %>', // Securely fetch Application ID from environment
+                locationId: '<%= process.env.SQUARE_LOCATION_ID %>', // Fetch Location ID from environment
                 inputClass: 'sq-input',
                 inputStyles: [{
                     fontSize: '16px',
@@ -110,8 +110,7 @@
                     },
                     body: JSON.stringify({ 
                         nonce: nonce, 
-                        name: name,  // Send name field
-                        amount: 1000 // Replace with actual amount in cents
+                        amount: 1000 // Replace with actual amount (cents)
                     })
                 })
                 .then(response => response.json())
