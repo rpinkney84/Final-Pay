@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Final Pay</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://web.squarecdn.com/v1/square.js"></script> <!-- Production URL -->
+    <script src="https://web.squarecdn.com/v1/square.js"></script> <!-- Ensure this is correct -->
 </head>
 <body>
     <header>
@@ -22,15 +22,15 @@
             </div>
             <div>
                 <label for="card-number-container">Card Number:</label>
-                <div id="card-number-container"></div> <!-- Match the ID here -->
+                <div id="card-number-container"></div>
             </div>
             <div>
                 <label for="cvv-container">CVV:</label>
-                <div id="cvv-container"></div> <!-- Match the ID here -->
+                <div id="cvv-container"></div>
             </div>
             <div>
                 <label for="expiration-date-container">Expiration Date:</label>
-                <div id="expiration-date-container"></div> <!-- Match the ID here -->
+                <div id="expiration-date-container"></div>
             </div>
             <button type="submit">Pay</button>
         </form>
@@ -39,8 +39,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const paymentForm = new SqPaymentForm({
-                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',  // Replace with your production application ID
-                locationId: 'LEYMZHA02ZJ74',          // Replace with your production location ID
+                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',
+                locationId: 'LEYMZHA02ZJ74',
                 inputClass: 'sq-input',
                 autoBuild: false,
                 cardNumber: {
