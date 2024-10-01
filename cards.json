@@ -1,0 +1,13 @@
+[
+    {
+        "nonce": "CARD_NONCE_1",
+        "authorization_code": "178434",
+        "amount": 900000
+    },
+    {
+        "nonce": "CARD_NONCE_2",
+        "authorization_code": "584526",
+        "amount": 1300000
+    }
+]
+

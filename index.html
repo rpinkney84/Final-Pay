@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Square Payment</title>
+    <script type="text/javascript" src="https://js.squareup.com/v2/paymentform" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #373F4A;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+            width: 200px; /* Adjust initial size */
+        }
+        .sq-input {
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 300px;
+            border-radius: 4px;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+        /* Media Queries for Responsive Design */
+        @media (max-width: 600px) {
+            .logo-container img {
+                width: 150px; /* Smaller size for mobile */
+            }
+        }
+        @media (min-width: 1200px) {
+            .logo-container img {
+                width: 300px; /* Larger size for desktops */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Section -->
+    <div class="logo-container">
+        <img src="/mnt/data/FF_LOGOs_registered-2R-down-gb.png" alt="Final Frontier Logo">
+    </div>
+
+    <h1>Payment Form</h1>
+    <form id="payment-form">
+        <div>
+            <label for="name">Name on Card:</label>
+            <input type="text" id="name" class="sq-input" placeholder="Enter your name" required>
+        </div>
+        <div id="card-container"></div> <!-- Square handles the card input here -->
+        <button type="submit">Pay</button>
+        <div class="error" id="error-message"></div>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const paymentForm = new SqPaymentForm({
+                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Your application ID
+                locationId: 'LEYMZHA02ZJ74', // Your location ID
+                inputClass: 'sq-input',
+                inputStyles: [{
+                    fontSize: '16px',
+                    padding: '16px',
+                    color: '#373F4A',
+                    placeholderColor: '#A0A0A0'
+                }],
+                card: {
+                    elementId: 'card-container', // ID where Square renders card fields
+                    placeholder: 'Card Number'
+                }
+            });
+
+            paymentForm.build(); // Build the payment form
+
+            // Handle form submission
+            document.getElementById('payment-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const name = document.getElementById('name').value;
+
+                // Validate fields
+                if (!name) {
+                    document.getElementById('error-message').textContent = "Please fill out all fields.";
+                    return;
+                }
+
+                // Request card nonce
+                paymentForm.requestCardNonce(); // Triggers the Square library to handle card input
+            });
+
+            paymentForm.on('cardNonceResponseReceived', function(errors, nonce) {
+                if (errors) {
+                    console.error('Errors:', errors);
+                    document.getElementById('error-message').textContent = "Error in card details.";
+                    return;
+                }
+
+                console.log('Nonce received:', nonce);
+                // Send the nonce and amount to the server
+                fetch('/process-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        nonce: nonce, 
+                        amount: 1000 // Set this to the actual amount in cents
+                    })
+                }).then(response => response.json())
+                  .then(data => console.log('Payment response:', data))
+                  .catch(err => console.error('Payment error:', err));
+            });
+        });
+    </script>
+</body>
+</html>
