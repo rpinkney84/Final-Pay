@@ -6,6 +6,24 @@
     <title>Payment Form</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://js.squareup.com/v2/paymentform"></script> <!-- Production URL for Square SDK -->
+    <style>
+        /* Responsive styles for the logo */
+        img {
+            max-width: 100%;
+            height: auto; /* Maintain aspect ratio */
+        }
+        /* Additional styles to ensure a good layout */
+        #card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Space between fields */
+            margin-top: 20px; /* Space above the payment fields */
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
