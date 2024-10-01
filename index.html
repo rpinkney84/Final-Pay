@@ -5,72 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Final Pay</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://web.squarecdn.com/v1/square.js"></script> <!-- Ensure this is correct -->
+    <script src="https://js.squareup.com/v2/paymentform"></script> <!-- Production link -->
 </head>
 <body>
     <header>
-        <h1>Welcome to Final Pay</h1>
+        <h1>Payment Form</h1>
         <a target="_blank" href="https://www.imghost.net/YfxupcFdWUez0Va">
-            <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Final Frontier Logo" style="max-height: 1in; max-width: 2in;"/>
+            <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Final Frontier Logo" style="width: 200px; height: auto;">
         </a>
     </header>
+
     <main>
         <form id="payment-form">
             <div>
-                <label for="name">Name:</label>
-                <input type="text" id="name" placeholder="John Doe" required>
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Name" required>
             </div>
             <div>
-                <label for="card-number-container">Card Number:</label>
+                <label for="card-number">Card Number</label>
                 <div id="card-number-container"></div>
             </div>
             <div>
-                <label for="cvv-container">CVV:</label>
+                <label for="cvv">CVV</label>
                 <div id="cvv-container"></div>
             </div>
             <div>
-                <label for="expiration-date-container">Expiration Date:</label>
+                <label for="expiration-date">Expiration Date</label>
                 <div id="expiration-date-container"></div>
             </div>
-            <button type="submit">Pay</button>
+            <div>
+                <button id="submit-button" type="submit">Pay</button>
+            </div>
+            <div id="error-message" style="color:red;"></div>
         </form>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const paymentForm = new SqPaymentForm({
-                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',
-                locationId: 'LEYMZHA02ZJ74',
-                inputClass: 'sq-input',
-                autoBuild: false,
-                cardNumber: {
-                    elementId: 'card-number-container',
-                    placeholder: 'Card Number',
-                    required: true,
-                },
-                cvv: {
-                    elementId: 'cvv-container',
-                    placeholder: 'CVV',
-                    required: true,
-                },
-                expirationDate: {
-                    elementId: 'expiration-date-container',
-                    placeholder: 'MM/YY',
-                    required: true,
-                },
-                callbacks: {
-                    onError: function (error) {
-                        console.error(error);
-                        alert(error.message);
+        const paymentForm = new SqPaymentForm({
+            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Replace with your application ID
+            locationId: 'LEYMZHA02ZJ74', // Replace with your location ID
+            inputClass: 'sq-input',
+            autoBuild: false,
+            cardNumber: {
+                elementId: 'card-number-container',
+                placeholder: 'Card Number'
+            },
+            cvv: {
+                elementId: 'cvv-container',
+                placeholder: 'CVV'
+            },
+            expirationDate: {
+                elementId: 'expiration-date-container',
+                placeholder: 'MM/YY'
+            },
+            callbacks: {
+                cardNonceResponseReceived: function (errors, nonce) {
+                    if (errors) {
+                        // Handle errors
+                        document.getElementById('error-message').innerText = errors.map(error => error.message).join(', ');
+                        return;
                     }
+                    // Process payment with nonce
+                    alert('Payment successful! Nonce: ' + nonce);
                 }
-            });
-
-            document.getElementById('payment-form').addEventListener('submit', (event) => {
-                event.preventDefault();
-                paymentForm.requestCardNonce(); // Create a nonce to process payment
-            });
+            }
         });
+
+        document.getElementById('submit-button').addEventListener('click', function (event) {
+            event.preventDefault();
+            paymentForm.requestCardNonce();
+        });
+
+        paymentForm.build();
     </script>
 </body>
 </html>
