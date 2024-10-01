@@ -51,14 +51,14 @@
 <body>
     <!-- Logo Section -->
     <div class="logo-container">
-        <img src="/public/FF_LOGOs_registered-2R-down-gb.png" alt="Final Frontier Logo">
+        <img src="https://drive.google.com/file/d/1oouUBfGresdVxSPSZXK4Ou79YnwrPO8t/view?usp=sharing" alt="Final Frontier Logo">
     </div>
 
     <h1>Payment Form</h1>
     <form id="payment-form">
         <div>
             <label for="name">Name on Card:</label>
-            <input type="text" id="name" class="sq-input" placeholder="Enter your name" required>
+            <input type="text" id="name" name="name" class="sq-input" placeholder="Enter your name" required>
         </div>
         <div id="card-container"></div>
         <button type="submit">Pay</button>
@@ -68,8 +68,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const paymentForm = new SqPaymentForm({
-                applicationId: '<%= process.env.SQUARE_APP_ID %>', // Securely fetch Application ID from environment
-                locationId: '<%= process.env.SQUARE_LOCATION_ID %>', // Fetch Location ID from environment
+                applicationId: '<%= process.env.SQUARE_APP_ID %>',
+                locationId: '<%= process.env.SQUARE_LOCATION_ID %>',
                 inputClass: 'sq-input',
                 inputStyles: [{
                     fontSize: '16px',
@@ -110,7 +110,8 @@
                     },
                     body: JSON.stringify({ 
                         nonce: nonce, 
-                        amount: 1000 // Replace with actual amount (cents)
+                        name: name,  // Send name field
+                        amount: 1000 // Replace with actual amount in cents
                     })
                 })
                 .then(response => response.json())
