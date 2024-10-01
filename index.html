@@ -41,12 +41,11 @@
             applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',  // Replace with your production application ID
             locationId: 'LEYMZHA02ZJ74',          // Replace with your production location ID
             inputClass: 'sq-input',
-            autoBuild: false, // Set to false since we are manually creating the fields
+            autoBuild: false, // Ensure this is false for manual setup
             // Define the input fields
             cardNumber: {
                 elementId: 'card-number-container',
                 placeholder: 'Card Number',
-                // Additional options to ensure interactivity
                 required: true,
             },
             cvv: {
@@ -59,13 +58,18 @@
                 placeholder: 'MM/YY',
                 required: true,
             },
-            // Optional: Add error handling if required
-            // Add other configurations you need here
+            // Handle errors
+            callbacks: {
+                onError: function (error) {
+                    console.error(error);
+                    alert(error.message);
+                }
+            }
         });
 
         document.getElementById('payment-form').addEventListener('submit', (event) => {
             event.preventDefault();
-            paymentForm.requestCardNonce(); // This method will create a nonce to process payment
+            paymentForm.requestCardNonce(); // Create a nonce to process payment
         });
     </script>
 </body>
