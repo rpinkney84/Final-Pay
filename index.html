@@ -3,94 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Form</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to the external CSS file -->
-    <script type="text/javascript" src="https://js.squareup.com/v2/paymentform"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        /* Additional inline styles for fallback, if needed */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-    </style>
+    <title>Final Pay</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://web.squarecdn.com/v1/square.js"></script> <!-- Production URL -->
 </head>
 <body>
-    <div class="container">
-        <div class="logo-container">
-            <a target="_blank" href="https://www.imghost.net/YfxupcFdWUez0Va">
-                <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Final Frontier Logo" style="height: 1in; width: 2in;">
-            </a>
-        </div>
-        
-        <h1>Payment Form</h1>
-        <form id="payment-form" class="sq-payment-form">
-            <div id="card-container">
-                <label for="card-number">Card Number</label>
-                <div id="card-number" class="sq-input"></div>
-                <label for="cvv">CVV</label>
-                <div id="cvv" class="sq-input"></div>
-                <label for="expiration-date">Expiration Date</label>
-                <div id="expiration-date" class="sq-input"></div>
+    <header>
+        <h1>Welcome to Final Pay</h1>
+        <a target="_blank" href="https://www.imghost.net/YfxupcFdWUez0Va">
+            <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Final Frontier Logo" style="max-height: 1in; max-width: 2in;"/>
+        </a>
+    </header>
+    <main>
+        <form id="payment-form">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="John Doe" required>
             </div>
-
-            <label for="name">Name</label>
-            <input type="text" id="name" class="sq-input" placeholder="Enter your name" required>
-
+            <div>
+                <label for="card-number">Card Number:</label>
+                <div id="card-number-container"></div>
+            </div>
+            <div>
+                <label for="cvv">CVV:</label>
+                <div id="cvv-container"></div>
+            </div>
+            <div>
+                <label for="expiration-date">Expiration Date:</label>
+                <div id="expiration-date-container"></div>
+            </div>
             <button type="submit">Pay</button>
         </form>
-    </div>
+    </main>
 
     <script>
-        $(document).ready(function () {
-            // Initialize Square Payment Form
-            const paymentForm = new SqPaymentForm({
-                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Replace with your application ID
-                locationId: 'LEYMZHA02ZJ74', // Replace with your location ID
-                inputClass: 'sq-input',
-                inputStyles: [{
-                    fontSize: '.9em',
-                    padding: '10px',
-                    color: '#373F4A',
-                }],
-                cardNumber: {
-                    elementId: 'card-number',
-                    placeholder: 'Card Number'
-                },
-                cvv: {
-                    elementId: 'cvv',
-                    placeholder: 'CVV'
-                },
-                expirationDate: {
-                    elementId: 'expiration-date',
-                    placeholder: 'MM/YY'
-                },
-                callbacks: {
-                    // Implement callbacks as needed
-                    cardNonceResponseReceived: function (errors, nonce) {
-                        if (errors) {
-                            console.error('Errors during nonce generation:', errors);
-                            return;
-                        }
+        const paymentForm = new SqPaymentForm({
+            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw',  // Replace with your production application ID
+            locationId: 'LEYMZHA02ZJ74',          // Replace with your production location ID
+            inputClass: 'sq-input',
+            autoBuild: false, // Set to false since we are manually creating the fields
+            // Define the input fields
+            cardNumber: {
+                elementId: 'card-number-container',
+                placeholder: 'Card Number',
+                // Additional options to ensure interactivity
+                required: true,
+            },
+            cvv: {
+                elementId: 'cvv-container',
+                placeholder: 'CVV',
+                required: true,
+            },
+            expirationDate: {
+                elementId: 'expiration-date-container',
+                placeholder: 'MM/YY',
+                required: true,
+            },
+            // Optional: Add error handling if required
+            // Add other configurations you need here
+        });
 
-                        // Use the nonce to create a payment
-                        console.log('Nonce received:', nonce);
-                    }
-                }
-            });
-
-            // On form submit, request a nonce
-            $('#payment-form').submit(function (event) {
-                event.preventDefault();
-                paymentForm.requestCardNonce();
-            });
+        document.getElementById('payment-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            paymentForm.requestCardNonce(); // This method will create a nonce to process payment
         });
     </script>
 </body>
