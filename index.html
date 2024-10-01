@@ -3,123 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Payment</title>
-    <script type="text/javascript" src="https://js.squareup.com/v2/paymentform" defer></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            text-align: center;
-            color: #373F4A;
-        }
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .logo-container img {
-            max-width: 100%;
-            height: auto;
-            width: 200px;
-        }
-        .sq-input {
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            width: 300px;
-            border-radius: 4px;
-        }
-        .error {
-            color: red;
-            font-size: 12px;
-        }
-        @media (max-width: 600px) {
-            .logo-container img {
-                width: 150px;
-            }
-        }
-        @media (min-width: 1200px) {
-            .logo-container img {
-                width: 300px;
-            }
-        }
-    </style>
+    <title>Payment Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://js.squareup.com/v2/paymentform"></script> <!-- Production URL for Square SDK -->
 </head>
 <body>
-    <!-- Logo Section -->
-    <div class="logo-container">
-        <a target="_blank" href="https://www.imghost.net/YfxupcFdWUez0Va">
-            <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Name Doublestack in Black with Trademark.png"/>
-        </a>
+
+    <div class="container">
+        <header>
+            <h1>Final Payment</h1>
+            <a target="_blank" href="https://www.imghost.net/YfxupcFdWUez0Va">
+                <img src="https://www.imghost.net/ib/nIz8KIBWiCsVElP_1727801092.png" alt="Name Doublestack in Black with Trademark.png"/>
+            </a>
+        </header>
+
+        <form id="payment-form">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div id="card-container">
+                <div id="card-number-container"></div>
+                <div id="cvv-container"></div>
+                <div id="expiration-date-container"></div>
+            </div>
+            <button type="submit">Pay</button>
+        </form>
+
+        <div id="error-message" class="error-message"></div>
     </div>
 
-    <h1>Payment Form</h1>
-    <form id="payment-form">
-        <div>
-            <label for="name">Name on Card:</label>
-            <input type="text" id="name" class="sq-input" placeholder="Enter your name" required>
-        </div>
-        <div id="card-container"></div>
-        <button type="submit">Pay</button>
-        <div class="error" id="error-message"></div>
-    </form>
-
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const paymentForm = new SqPaymentForm({
-                applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Securely fetch Application ID from environment
-                locationId: 'LEYMZHA02ZJ74', // Fetch Location ID from environment
-                inputClass: 'sq-input',
-                inputStyles: [{
-                    fontSize: '16px',
-                    padding: '16px',
-                    color: '#373F4A',
-                    placeholderColor: '#A0A0A0'
-                }],
-                card: {
-                    elementId: 'card-container',
-                    placeholder: 'Card Number'
-                }
-            });
+        const paymentForm = new SqPaymentForm({
+            applicationId: 'sq0idp-DreuQJYtaeQ9RWuMyVxLXw', // Your Production Application ID
+            locationId: 'LEYMZHA02ZJ74', // Your Production Location ID
+            inputClass: 'sq-input',
+            autoBuild: false, // Set to false to build the form manually
 
-            paymentForm.build();
+            // Callbacks for rendering inputs
+            cardNumber: {
+                elementId: 'card-number-container',
+                placeholder: 'Card Number'
+            },
+            cvv: {
+                elementId: 'cvv-container',
+                placeholder: 'CVV'
+            },
+            expirationDate: {
+                elementId: 'expiration-date-container',
+                placeholder: 'MM/YY'
+            },
 
-            document.getElementById('payment-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const name = document.getElementById('name').value;
+            // Callbacks for handling payment submission
+            callbacks: {
+                onPaymentFormLoaded: function() {
+                    console.log("Payment form loaded successfully");
+                },
+                onPaymentFormSubmit: function() {
+                    console.log("Payment form submitted");
+                },
+                onCardNonceResponseReceived: function(errors, nonce) {
+                    if (errors) {
+                        // Handle errors
+                        console.log(errors);
+                        return;
+                    }
 
-                if (!name) {
-                    document.getElementById('error-message').textContent = "Please fill out all fields.";
-                    return;
-                }
-
-                paymentForm.requestCardNonce();
-            });
-
-            paymentForm.on('cardNonceResponseReceived', function(errors, nonce) {
-                if (errors) {
-                    document.getElementById('error-message').textContent = "Error in card details.";
-                    return;
-                }
-
-                fetch('/process-payment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        nonce: nonce, 
-                        amount: 1000 // Replace with actual amount (cents)
+                    // Send the nonce to your server
+                    const payload = { nonce: nonce, amount: 20130 }; // Amount in cents
+                    fetch('/process-payment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(payload),
                     })
-                })
-                .then(response => response.json())
-                .then(data => console.log('Payment response:', data))
-                .catch(err => console.error('Payment error:', err));
-            });
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Payment processed successfully:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error processing payment:', error);
+                    });
+                },
+                onError: function(error) {
+                    console.error('Payment form error:', error);
+                }
+            }
         });
+
+        paymentForm.build(); // Build the payment form
     </script>
 </body>
 </html>
